@@ -230,6 +230,10 @@ def set_cors_headers(response):
             response.headers["Access-Control-Allow-Headers"] = request.headers[
                 "Access-Control-Request-Headers"
             ]
+
+    if os.environ.get('X_SERVER_NAME') is not None:
+        response.headers['X-Server-Name'] = os.environ['X_SERVER_NAME']
+
     return response
 
 
