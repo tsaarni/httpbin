@@ -48,6 +48,7 @@ from .helpers import (
     parse_multi_value_header,
     next_stale_after_value,
     digest_challenge_response,
+    EventStream
 )
 from .utils import weighted_choice
 from .structures import CaseInsensitiveDict
@@ -1776,6 +1777,24 @@ def a_json_endpoint():
             ],
         }
     )
+
+
+@app.route("/sse")
+def long_poll():
+    """Push server-sent event stream to client
+    ---
+    tags:
+      - Dynamic data
+    produces:
+      - text/event-stream
+    responses:
+      200:
+        description: SSE event stream with JSON data
+    """
+    stream = EventStream()
+    return Response(stream,
+        mimetype="text/event-stream")
+
 
 
 if __name__ == "__main__":

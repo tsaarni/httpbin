@@ -12,12 +12,14 @@ import base64
 import re
 import time
 import os
+import datetime
 from hashlib import md5, sha256, sha512
 from werkzeug.http import parse_authorization_header
 from werkzeug.datastructures import WWWAuthenticate
 
 from flask import request, make_response
 from six.moves.urllib.parse import urlparse, urlunparse
+from sse import Sse
 
 
 from .structures import CaseInsensitiveDict
@@ -472,3 +474,19 @@ def digest_challenge_response(app, qop, algorithm, stale = False):
     auth.stale = stale
     response.headers['WWW-Authenticate'] = auth.to_header()
     return response
+
+
+class EventStream(object):
+
+    def __iter__(self):
+        sse = Sse()
+        i = 1
+        while True:
+            sse.add_message("data", json.dumps({
+                "id": str(i),
+                "data": str(datetime.datetime.now())
+            }))
+            for data in sse:
+                yield data.encode('u8')
+            time.sleep(4)
+            i = i + 1
