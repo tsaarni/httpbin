@@ -5,22 +5,22 @@ RUN apk --update add python3 && \
 
 ADD Pipfile Pipfile.lock /httpbin/
 WORKDIR /httpbin
-RUN apk add --virtual build-dependencies python3-dev build-base libffi-dev && \
+ADD . /httpbin
+RUN apk add --virtual build-dependencies python3-dev build-base libffi-dev git && \
     pipenv lock -r > /tmp/requirements.txt && \
     pip3 install --no-cache-dir -r /tmp/requirements.txt && \
     rm /tmp/requirements.txt && \
+    pip3 install --no-cache-dir /httpbin && \
     apk del build-dependencies && \
     rm -rf /root/.cache /var/cache/apk/*
 
-ADD . /httpbin
-RUN pip3 install --no-cache-dir /httpbin
 
 EXPOSE 80
 
-CMD ["gunicorn", "-b", "0.0.0.0:80", "--access-logfile", "-", "httpbin:app", "-k", "gevent"]
+CMD ["hypercorn", "-b", "0.0.0.0:80", "--access-logfile", "-", "httpbin:app", "-k", "asyncio"]
 
 # verify client certificate?
 #   ssl.CERT_NONE = 0
 #   ssl.CERT_OPTIONAL = 1
 #   ssl.CERT_REQUIRED = 2
-#CMD ["gunicorn", "-b", "0.0.0.0:443", "--access-logfile", "-", "--certfile", "/input/certs/httpbin.pem", "--keyfile", "/input/certs/httpbin-key.pem", "--cert-reqs", "0", "--ca-certs", "/input/certs/server-root.pem", "httpbin:app", "-k", "gevent"]
+#CMD ["hypercorn", "-b", "0.0.0.0:443", "--access-logfile", "-", "--certfile", "/input/certs/httpbin.pem", "--keyfile", "/input/certs/httpbin-key.pem", "--cert-reqs", "0", "--ca-certs", "/input/certs/server-root.pem", "httpbin:app", "-k", "asyncio"]

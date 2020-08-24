@@ -3,10 +3,9 @@ url = "https://pypi.python.org/simple"
 verify_ssl = true
 
 [packages]
-gunicorn = "*"
+hypercorn = "*"
 decorator = "*"
 brotlipy = "*"
-gevent = "*"
 Flask = "*"
 meinheld = "*"
 werkzeug = ">=0.14.1"
